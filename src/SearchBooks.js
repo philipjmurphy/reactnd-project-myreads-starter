@@ -30,12 +30,12 @@ class SearchBooks extends Component {
 
         if(query) {
             const match = new RegExp(escapeRegExp(query), 'i')
-            showingBooks = books.filter((book) => match.test(book.title))
+            showingBooks = books.filter((book) => match.test(book.title) || match.test(book.authors))
         } else {
             showingBooks = []
         }
 
-        showingBooks = showingBooks.sort(sortBy('name'))
+        showingBooks = showingBooks.sort(sortBy('title'))
 
         return (
             <div className="search-books">
