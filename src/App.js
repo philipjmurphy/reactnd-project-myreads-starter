@@ -24,8 +24,8 @@ class BooksApp extends Component {
 
     updateShelf(book, shelf) {
         BooksAPI.update(book, shelf).then(() => {
-            this.setState({
-                books : this.state.books.map(b => {
+            this.setState((state) => ({
+                books : state.books.map(b => {
                     // Change the bookshelf for the matching book.
                     if (b.id === book.id) {
                         b.shelf = shelf
@@ -34,22 +34,20 @@ class BooksApp extends Component {
                     return b
                 })
             })
-        })
+        )})
     }
 
-    render() {
-        return (
-            <div className="app">
-                <Route exact path="/" render={() => (
-                    <ListBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
-                )} />
+    render = () => (
+        <div className="app">
+            <Route exact path="/" render={() => (
+                <ListBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
+            )} />
 
-                <Route path="/search" render={() => (
-                    <SearchBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
-                )} />
-            </div>
-        )
-    }
+            <Route path="/search" render={() => (
+                <SearchBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
+            )} />
+        </div>
+    )
 }
 
 export default BooksApp

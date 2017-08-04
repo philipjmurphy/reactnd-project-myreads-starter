@@ -23,10 +23,6 @@ class SearchBooks extends Component {
         this.setState({ query: query.trim() })
     }
 
-    clearQuery = () => {
-        this.setState({ query: '' })
-    }
-
     render() {
         let showingBooks
         const {books, updateShelf} = this.props
