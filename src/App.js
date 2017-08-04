@@ -44,7 +44,7 @@ class BooksApp extends Component {
                     <ListBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
                 )} />
 
-                <Route path="/search" render={({ history }) => (
+                <Route path="/search" render={() => (
                     <SearchBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
                 )} />
             </div>
