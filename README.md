@@ -3,8 +3,11 @@ MyReads: A Book Lending App
 
 To install and launch the application:
 
-npm install
-npm start
+step 1. git clone https://github.com/philipjmurphy/reactnd-project-myreads-starter.git
+
+step 2. npm install
+
+step 3. npm start
 
 This will install the application and start it automatically.
 
