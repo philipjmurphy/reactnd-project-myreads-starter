@@ -1,10 +1,10 @@
 import React, {Component} from 'react'
-import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import escapeRegExp from 'escape-string-regexp'
-import sortBy from 'sort-by'
+import PropTypes from 'prop-types'
 
-import Book from './Book'
+import * as BooksAPI from './BooksAPI'
+
+import SearchBooksResults from './SearchBooksResults'
 
 /**
  * Search Books component.
@@ -16,26 +16,61 @@ class SearchBooks extends Component {
     }
 
     state = {
-        query: ''
+        query: '',
+        booksResults: [],
+        maxResults: 10
     }
 
     updateQuery = (query) => {
-        this.setState({ query: query.trim() })
+        this.setState({query})
+    }
+
+    search = (query) => {
+        const {books} = this.props
+        const {maxResults} = this.state
+
+        if(query) {
+            BooksAPI.search(query, maxResults).then(booksResults => {
+
+                // Handle API response errors.
+                if (typeof booksResults === 'undefined' || booksResults.error) {
+                    if(booksResults.error && booksResults.error === 'empty query') {
+                        console.log('Warning: check that you are using a known search term.')
+                    } else {
+                        console.log('Error occurred when searching.');
+                    }
+
+                    this.setState({booksResults: []})
+                    return;
+                }
+
+                // Initialise bookshelves to 'none'.
+                booksResults.map(book => {
+                    book.shelf = 'none'
+                    return book
+                })
+
+                // Update search results with my bookself state.
+                for (let myBook of books) {
+                    booksResults.map(book => {
+                        if (myBook.id === book.id) {
+                            book.shelf = myBook.shelf
+                        }
+
+                        return book
+                    })
+                }
+
+                this.setState({booksResults})
+            }).catch(err => console.log('API error', err))
+        } else {
+            this.setState({booksResults: []})
+        }
     }
 
     render() {
-        let showingBooks
-        const {books, updateShelf} = this.props
-        const {query} = this.state
-
-        if(query) {
-            const match = new RegExp(escapeRegExp(query), 'i')
-            showingBooks = books.filter((book) => match.test(book.title) || match.test(book.authors))
-        } else {
-            showingBooks = []
-        }
-
-        showingBooks = showingBooks.sort(sortBy('title'))
+        const {updateShelf} = this.props
+        const {query, booksResults} = this.state
 
         return (
             <div className="search-books">
@@ -47,20 +82,18 @@ class SearchBooks extends Component {
                             type='text'
                             placeholder='Search by title or author'
                             value={query}
-                            onChange={(event) => this.updateQuery(event.target.value)}
+                            onChange={(event) => {
+                                let query = event.target.value.trim()
+                                this.updateQuery(query)
+                                this.search(query)
+                            }}
                         />
                     </div>
                 </div>
 
-                <div className="search-books-results">
-                    <ol className="books-grid">
-                        {showingBooks.map(book => (
-                            <li key={book.id}>
-                                <Book book={book} updateShelf={updateShelf} />
-                            </li>
-                        ))}
-                    </ol>
-                </div>
+                <SearchBooksResults
+                    booksResults={booksResults}
+                    updateShelf={updateShelf} />
             </div>
         )
     }

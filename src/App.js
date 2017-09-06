@@ -1,10 +1,10 @@
 import React, {Component} from 'react'
 import { Route } from 'react-router-dom'
 
-import * as BooksAPI from './BooksAPI'
-
 import ListBooks from './ListBooks'
 import SearchBooks from './SearchBooks'
+
+import * as BooksAPI from './BooksAPI'
 
 import './App.css'
 
@@ -22,17 +22,12 @@ class BooksApp extends Component {
         })
     }
 
-    updateShelf(book, shelf) {
+    updateShelf = (book, shelf) => {
         BooksAPI.update(book, shelf).then(() => {
+            // Update bookshelf and add if not already present.
+            book.shelf = shelf
             this.setState((state) => ({
-                books : state.books.map(b => {
-                    // Change the bookshelf for the matching book.
-                    if (b.id === book.id) {
-                        b.shelf = shelf
-                    }
-
-                    return b
-                })
+                books: state.books.filter(b => b.id !== book.id).concat([book])
             })
         )})
     }
@@ -40,11 +35,11 @@ class BooksApp extends Component {
     render = () => (
         <div className="app">
             <Route exact path="/" render={() => (
-                <ListBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
+                <ListBooks books={this.state.books} updateShelf={this.updateShelf} />
             )} />
 
             <Route path="/search" render={() => (
-                <SearchBooks books={this.state.books} updateShelf={this.updateShelf.bind(this)} />
+                <SearchBooks books={this.state.books} updateShelf={this.updateShelf} />
             )} />
         </div>
     )
